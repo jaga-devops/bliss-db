@@ -1,0 +1,42 @@
+---
+# tasks file for mongo
+
+- name: Update all packages to their latest version
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+- name: get apt repo key
+  apt_key:
+    url: '{{ public_signing_key  }}'
+    state: present
+- name: Add MONGODB repository
+  apt_repository:
+    repo: '{{ mongo_repo }}'
+- name: Update all packages to their latest version
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+- name: INSTALLING REQUIRED PACKAGES
+  apt:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - mongodb-org-server
+    - mongodb-org-shell
+    -  mongodb-org-mongos
+    - mongodb-org-tools
+- name: Start service mongodb, if not started
+  service:
+    name: '{{ svc }}'
+    state: started
+- name: Enable service MONGODB, and not touch the state
+  service:
+    name: '{{ svc }}'
+    enabled: yes
+- name: This command will change the working directory to somedir/
+  shell: |
+    echo "mongodb-org hold" | sudo dpkg --set-selections
+    echo "mongodb-org-server hold" | sudo dpkg --set-selections
+    echo "mongodb-org-shell hold" | sudo dpkg --set-selections
+    echo "mongodb-org-mongos hold" | sudo dpkg --set-selections
+    echo "mongodb-org-tools hold" | sudo dpkg --set-selections
